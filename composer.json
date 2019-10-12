@@ -1,0 +1,31 @@
+{
+    "name": "sagleft/utopialib-php",
+    "description": "PHP library for Utopia Network API",
+    "keywords": ["utopia", "lib", "php"],
+    "license" : "MIT",
+    "authors" : [
+        {
+            "name": "Sagleft",
+            "email": "sagleft@mfc.click",
+            "homepage": "https://sagleft.ru"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "guzzlehttp/guzzle": "^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0 || ^8.0",
+        "vlucas/phpdotenv": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "UtopiaLib\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
