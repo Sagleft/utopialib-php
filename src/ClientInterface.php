@@ -211,7 +211,8 @@
 			
 			* @param int $folderType - 1, 2, 4, 8 or 16.
 			* @param string $search_filter - (optional) partial matching of the Public Key, Nickname or text in uMail
-			* @param string $query_filter - (optional) filter which can be applied to ANY method returning an array
+			* @param Filter $query_filter - (optional) filter which can be applied to ANY method returning an array
+			* @throws RuntimeException
 			* @return array (of int)
 		*/
 		public function getEmailFolder($folderType = 1, $search_filter = "", $query_filter = null): array;
@@ -221,9 +222,133 @@
 			
 			* @param int $folderType - 1, 2, 4, 8 or 16.
 			* @param string $search_filter - (optional) partial matching of the Public Key, Nickname or text in uMail
-			* @param string $query_filter - (optional) filter which can be applied to ANY method returning an array
+			* @param Filter $query_filter - (optional) filter which can be applied to ANY method returning an array
+			* @throws RuntimeException
 			* @return array (of int)
 		*/
 		public function getEmails($folderType = 1, $search_filter = "", $query_filter = null): array;
+		
+		/**
+			* returns the information based on the selected email in uMail. The method is called by using the Id parameter, which passes on the id of the email (id of the email can be found by using getEmailFolder method).
+			
+			* @param int $id - id of the email
+			* @return array
+		*/
+		public function getEmailById($id = 33): array;
+		
+		/**
+			* deletes email in uMail. First deletion will move email to the Trash, subsequent will remove from the database.
+			
+			* @param int $id - id of the email
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function deleteEmail($id = 33): bool;
+		
+		/**
+			* creates response email in uMail for the incoming email and sends it to the contact with new message. The method is called by using the Id parameters, which pass on the id of the email (id of the email can be found by using getEmailFolder method) and Body, which passes on the text of the email in uMail. In the Response field the status of completion of the operation is displayed.
+			
+			* @param int $id - id of the email
+			* @param string $body - message content
+			* @param string $subject - message subject
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function sendReplyEmailMessage($id = 33, $body = "my message", $subject = "uMail subject"): bool;
+		
+		/**
+			* creates response email for an incoming email in uMail and sends it to the selected contact with the new message. The method is called by using the 'Id' parameter, which passes on the id of the email (id of the email can be found by using getEmailFolder method); 'To', which passes on the Public Key or Nickname of the user to which the email will be sent; and 'Body', which passes on the text in uMail. In the Response field the status of completion of the operation is displayed.
+			
+			* @param int $id - id of the email
+			* @param string $pkOrNick - Public Key or nick name of the contact
+			* @param string $body - message content
+			* @param string $subject - message subject
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function sendForwardEmailMessage($id = 33, $pkOrNick = "", $body = "my message", $subject = "uMail subject"): bool;
+		
+		/**
+			* returns in the Response field the information about Utopia financial system (information about fees and limits). Method is called without using any parameters.
+			
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function getFinanceSystemInformation(): array;
+		
+		/**
+			* allows to receive the history of financial transactions based on the specifications in the parameters of the filter.
+			
+			* @throws RuntimeException
+			* @return array
+		*/
+		public function getFinanceHistory($filters = "ALL_TRANSFERS", $referenceNumber = "", $toDate = "", $fromDate = "", $batchId = "", $fromAmount = "", $toAmount = "", $query_filter = null): array;
+		
+		/**
+			* returns in the Response field the current list of cards and their detailed information from uWallet. Method is called without using any parameters.
+			
+			* @throws RuntimeException
+			* @return array
+		*/
+		public function getCards(): array;
+		
+		/**
+			* sends the request for creation of new card in uWallet. The method is called by using the following parameters: Name, which passes on the name of the new card (can contain between 1 and 32 symbols), Color, which passes on the color of the card ( in RGB format, for example '#FFFFFF') and also can specify the First 4 numbers of the card for customization ( it is possible to change only 4 first symbols, can contain symbols (A-F) and numbers (0-9)). In the Response field the status of completion of the operation is displayed.
+			
+			* @param stirng $name - card name
+			* @param string $name - card color
+			* @param string $numbers - 4 numbers for customization
+			* @throws RuntimeException
+			* @return string
+		*/
+		public function addCard($name = "new card", $color = "#FFFFFF", $numbers = "0000"): string;
+		
+		/**
+			* deletes the existing card from uWallet. The amount from card will be returned to the main balance. The following parameter is specified: CardId, which passes on the card number ( CardId can be found by using the getCards method). In the Response field the status of completion of the operation is displayed.
+			
+			* @param string $cardId - crypto card ID
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function deleteCard($cardId): bool;
+		
+		/**
+			* turns on the mining in the Utopia client (mining is available only for x64 client). As a parameter the Status (true/false) is specified, which turns on or off the mining process. In the Response field the status of completion of the operation is displayed.
+			
+			* @param bool $enabled - set mining status
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function enableMining($enabled = true): bool;
+		
+		/**
+			* turns on and off the daily interest on the remaining irreducible account balance. As a parameter, one of the two statuses, true or false is selected. In the Response field the status of completion of turning on or off the operation is displayed.
+			
+			* @param bool $enabled - set mining status
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function enableInterest($enabled = true): bool;
+		
+		/**
+			* changes the option of the automatic reading of the mining history from the financial server. As a parameter of the method, the status of true or false is specified. In the Response field the status of completion of turning on or off the operation is displayed.
+			
+			* @param bool $enabled - set mining status
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function enableHistoryMining($enabled = true): bool;
+		
+		/**
+			* returns in the Response block the status of mining history poll. Method is called without using any parameters.
+			Meaning of different states:
+				0 = STATE_EMPTY
+				1 = STATE_IN_PROGRESS
+				2 = STATE_RECEIVED_RESPONSE
+			
+			* @throws RuntimeException
+			* @return bool
+		*/
+		public function statusHistoryMining(): int;
 	}
 	

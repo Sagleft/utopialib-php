@@ -108,5 +108,32 @@
 			$status_success = is_array($result);
 			$this->assertTrue($status_success);
 		}
+		
+		/**
+			@depends testClientCanConnect
+		*/
+		public function testClientGetFinanceInfo($client) {
+			$result = $client->getFinanceSystemInformation();
+			$status_success = $result != [] && isset($result['cardCreatePrice']);
+			$this->assertTrue($status_success);
+		}
+		
+		/**
+			@depends testClientCanConnect
+		*/
+		public function testClientGetBalance($client) {
+			$result = $client->getBalance();
+			$status_success = $result >= 0;
+			$this->assertTrue($status_success);
+		}
+		
+		/**
+			@depends testClientCanConnect
+		*/
+		public function testClientGetFinanceHistory($client) {
+			$result = $client->getFinanceHistory();
+			$status_success = count($result) >= 0;
+			$this->assertTrue($status_success);
+		}
 	}
 	

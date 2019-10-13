@@ -1,3 +1,4 @@
+
 UtopiaLib
 ==========
 
@@ -45,6 +46,8 @@ Array
 
 )
 ```
+
+You can find out more about all the methods [in the interface of the main class.](src/ClientInterface.php)
 
 License
 -------
