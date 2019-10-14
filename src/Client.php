@@ -1281,5 +1281,109 @@
 			}
 			return $response['result'];
 		}
+		
+		public function getWhoIsInfo($pkOrNick): array {
+			$params = [
+				'owner' => $pkOrNick
+			];
+			$response = $this->api_query("getWhoIsInfo", $params);
+			if(! $this->checkResultContains($response)) {
+				return [];
+			}
+			return $response['result'];
+		}
+		
+		public function requestTreasuryInterestRates(): bool {
+			$response = $this->api_query("requestTreasuryInterestRates");
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+		
+		public function getTreasuryInterestRates(): array {
+			$response = $this->api_query("getTreasuryInterestRates");
+			if(! $this->checkResultContains($response)) {
+				return [];
+			}
+			return $response['result'];
+		}
+		
+		public function requestTreasuryTransactionVolumes(): bool {
+			$response = $this->api_query("requestTreasuryTransactionVolumes");
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+		
+		public function getTreasuryTransactionVolumes($query_filter = null): array {
+			$response = $this->api_query("getTreasuryTransactionVolumes", [], $query_filter);
+			if(! $this->checkResultContains($response)) {
+				return [];
+			}
+			return $response['result'];
+		}
+		
+		public function ucodeEncode($hex_code, $size_image = 128, $coder = "BASE64", $format = "JPG"): string {
+			if(!ctype_xdigit($hex_code)) {
+				$this->error = "hex_code must be in hexadecimal representation";
+				return "";
+			}
+			switch($coder) {
+				default:
+					$coder = "BASE64"; break;
+				case 'BASE64': break;
+				case 'HEX': break;
+			}
+			switch($format) {
+				default:
+					$format = "JPG"; break;
+				case 'JPG': break;
+				case 'PNG': break;
+			}
+			$params = [
+				'hex_code'   => $hex_code,
+				'size_image' => $size_image,
+				'coder'      => $coder,
+				'format'     => $format
+			];
+			$response = $this->api_query("ucodeEncode", $params);
+			if(! $this->checkResultContains($response)) {
+				return "";
+			}
+			return $response['result'];
+		}
+		
+		public function ucodeDecode($base64_image): array {
+			$params = [
+				'base64_image' => $base64_image
+			];
+			$response = $this->api_query("ucodeDecode", $params);
+			if(! $this->checkResultContains($response)) {
+				return "";
+			}
+			return $response['result'];
+		}
+		
+		public function getWebSocketState(): int {
+			$response = $this->api_query("getWebSocketState");
+			if(! $this->checkResultContains($response)) {
+				return 0;
+			}
+			return $response['result'];
+		}
+		
+		public function setWebSocketState($enabled = "false", $port = "226748"): int {
+			$params = [
+				'enabled' => (string) $enabled,
+				'port'    => $port
+			];
+			$response = $this->api_query("setWebSocketState");
+			if(! $this->checkResultContains($response)) {
+				return 0;
+			}
+			return $response['result'];
+		}
 	}
 	
