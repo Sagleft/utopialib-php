@@ -202,8 +202,8 @@
 				return false;
 			}
 			$params = [
-				'pk'        => $pk,
-				'groupName' => $groupName
+				'contactPublicKey' => $pk,
+				'groupName'        => $groupName
 			];
 			$response = $this->api_query("setContactGroup", $params);
 			if(! $this->checkResultContains($response)) {
@@ -221,8 +221,8 @@
 				return false;
 			}
 			$params = [
-				'pk'      => $pk,
-				'newNick' => $newNick
+				'contactPublicKey' => $pk,
+				'newNick'          => $newNick
 			];
 			$response = $this->api_query("setContactNick", $params);
 			if(! $this->checkResultContains($response)) {
