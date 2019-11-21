@@ -877,8 +877,8 @@
 		
 		public function getChannels($search_filter = "", $channel_type = 0, $query_filter = null): array {
 			$params = [
-				'search_filter' => $search_filter,
-				'channel_type'  => $channel_type
+				'filter'       => $search_filter,
+				'channel_type' => $channel_type
 			];
 			$response = $this->api_query("getChannels", $params, $query_filter);
 			if(! $this->checkResultContains($response)) {
