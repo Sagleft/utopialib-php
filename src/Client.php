@@ -2,12 +2,13 @@
 	namespace UtopiaLib;
 	
 	class Client implements ClientInterface {
-		public $error = ""; //last error
+		public $error = ''; //last error
+		public $last_response = ''; //for debug
 		
 		private $api_port    = 22659;
-		private $api_host    = "";
-		private $api_token   = "";
-		private $api_version = "1.0";
+		private $api_host    = '';
+		private $api_token   = '';
+		private $api_version = '1.0';
 		private $client = null; //Graze\GuzzleHttp\JsonRpc\Client
 		private $is_debug = false;
 		
@@ -67,6 +68,7 @@
 					$this->error = $response['error'];
 				}
 				$this->error = "the 'result' key was not found in the response";
+				$this->last_response = $response;
 				if($this->is_debug) {
 					throw new \RuntimeException($this->error);
 				}
@@ -382,7 +384,20 @@
 		
 		public function sendEmailMessage($pkOrNick, $subject = "test message", $body = "message content"): bool {
 			$params = [
-				'pk'      => $pkOrNick,
+				'to'      => [$pkOrNick],
+				'subject' => $subject,
+				'body'    => $body
+			];
+			$response = $this->api_query("sendEmailMessage", $params, $query_filter);
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+		
+		public function sendManyEmailMessages($pk_arr = [], $subject = "test message", $body = "message content"): bool {
+			$params = [
+				'to'      => $pk_arr,
 				'subject' => $subject,
 				'body'    => $body
 			];
