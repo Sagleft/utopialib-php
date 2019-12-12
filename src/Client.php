@@ -1308,6 +1308,25 @@
 			return $response['result'];
 		}
 		
+		public function isUserMyContact($pkOrNick): bool {
+			$whois_info = $this->getWhoIsInfo($pkOrNick);
+			$general = $whois_info['general'];
+			
+			$is_known = false;
+			for($i = 0; $i < count($general); $i++) {
+				$line = $general[$i];
+				if($line['name'] == 'You have this Public Key in your contact list' || $line['name'] == 'В вашем списке контактов есть этот Public Key') {
+					if($line['value'] == 'Yes' || $line['value'] == 'Да') {
+						$is_known = true;
+					} else {
+						$is_known = false;
+					}
+					break;
+				}
+			}
+			return $is_known;
+		}
+		
 		public function requestTreasuryInterestRates(): bool {
 			$response = $this->api_query("requestTreasuryInterestRates");
 			if(! $this->checkResultContains($response)) {
