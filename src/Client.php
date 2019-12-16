@@ -40,6 +40,7 @@
 			}
 			try {
 				$response = $this->guzzleQuery($this->getApiUrl(), $query_body);
+				$this->last_response = $response;
 			} catch(\GuzzleHttp\Exception\ClientException $ex) {
 				$response = "";
 				$this->error = $ex->getMessage();
@@ -74,7 +75,7 @@
 					$this->error = $response['error'];
 				}
 				$this->error = "the 'result' key was not found in the response";
-				$this->last_response = $response;
+				//$this->last_response = $response;
 				if($this->is_debug) {
 					throw new \RuntimeException($this->error);
 				}
@@ -388,7 +389,11 @@
 			return $response['result'];
 		}
 		
-		public function sendEmailMessage($pkOrNick, $subject = "test message", $body = "message content"): bool {
+		public function sendEmailMessage($pkOrNick = '', $subject = 'test message', $body = 'message content'): bool {
+			if($pkOrNick == '') {
+				$this->error = 'empty pubkey given for sendEmailMessage method';
+				return false;
+			}
 			$params = [
 				'to'      => [$pkOrNick],
 				'subject' => $subject,
