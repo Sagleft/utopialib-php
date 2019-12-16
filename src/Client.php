@@ -35,10 +35,16 @@
 				$query_body['filter'] = [
 					'sortBy' => $filter->sortBy,
 					'offset' => $filter->offset,
-					'limit'  => $filter->limit,
+					'limit'  => $filter->limit
 				];
 			}
-			$response = $this->guzzleQuery($this->getApiUrl(), $query_body);
+			try {
+				$response = $this->guzzleQuery($this->getApiUrl(), $query_body);
+			} catch(\GuzzleHttp\Exception\ClientException $ex) {
+				$response = "";
+				$this->error = $ex->getMessage();
+				return [];
+			}
 			
 			if(! Utilities::isJson($response)) {
 				return [];
