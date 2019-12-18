@@ -2,12 +2,13 @@
 	namespace UtopiaLib;
 	
 	class Client implements ClientInterface {
-		public $error = ""; //last error
+		public $error = ''; //last error
+		public $last_response = ''; //for debug
 		
 		private $api_port    = 22659;
-		private $api_host    = "";
-		private $api_token   = "";
-		private $api_version = "1.0";
+		private $api_host    = '';
+		private $api_token   = '';
+		private $api_version = '1.0';
 		private $client = null; //Graze\GuzzleHttp\JsonRpc\Client
 		private $is_debug = false;
 		
@@ -34,10 +35,21 @@
 				$query_body['filter'] = [
 					'sortBy' => $filter->sortBy,
 					'offset' => $filter->offset,
-					'limit'  => $filter->limit,
+					'limit'  => $filter->limit
 				];
 			}
-			$response = $this->guzzleQuery($this->getApiUrl(), $query_body);
+			try {
+				$response = $this->guzzleQuery($this->getApiUrl(), $query_body);
+				$this->last_response = $response;
+			} catch(\GuzzleHttp\Exception\ClientException $ex) {
+				$response = "";
+				$this->error = $ex->getMessage();
+				return [];
+			} catch(\GuzzleHttp\Exception\ConnectException $ex) {
+				$response = "";
+				$this->error = 'failed to connect to Utopia client, timeout';
+				return [];
+			}
 			
 			if(! Utilities::isJson($response)) {
 				return [];
@@ -67,6 +79,7 @@
 					$this->error = $response['error'];
 				}
 				$this->error = "the 'result' key was not found in the response";
+				//$this->last_response = $response;
 				if($this->is_debug) {
 					throw new \RuntimeException($this->error);
 				}
@@ -380,9 +393,26 @@
 			return $response['result'];
 		}
 		
-		public function sendEmailMessage($pkOrNick, $subject = "test message", $body = "message content"): bool {
+		public function sendEmailMessage($pkOrNick = '', $subject = 'test message', $body = 'message content'): bool {
+			if($pkOrNick == '') {
+				$this->error = 'empty pubkey given for sendEmailMessage method';
+				return false;
+			}
 			$params = [
-				'pk'      => $pkOrNick,
+				'to'      => [$pkOrNick],
+				'subject' => $subject,
+				'body'    => $body
+			];
+			$response = $this->api_query("sendEmailMessage", $params, $query_filter);
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+		
+		public function sendManyEmailMessages($pk_arr = [], $subject = "test message", $body = "message content"): bool {
+			$params = [
+				'to'      => $pk_arr,
 				'subject' => $subject,
 				'body'    => $body
 			];
@@ -1291,6 +1321,25 @@
 				return [];
 			}
 			return $response['result'];
+		}
+		
+		public function isUserMyContact($pkOrNick): bool {
+			$whois_info = $this->getWhoIsInfo($pkOrNick);
+			$general = $whois_info['general'];
+			
+			$is_known = false;
+			for($i = 0; $i < count($general); $i++) {
+				$line = $general[$i];
+				if($line['name'] == 'You have this Public Key in your contact list' || $line['name'] == 'В вашем списке контактов есть этот Public Key') {
+					if($line['value'] == 'Yes' || $line['value'] == 'Да') {
+						$is_known = true;
+					} else {
+						$is_known = false;
+					}
+					break;
+				}
+			}
+			return $is_known;
 		}
 		
 		public function requestTreasuryInterestRates(): bool {
