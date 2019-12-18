@@ -398,6 +398,7 @@
 				$this->error = 'empty pubkey given for sendEmailMessage method';
 				return false;
 			}
+      
 			$params = [
 				'to'      => [$pkOrNick],
 				'subject' => $subject,
