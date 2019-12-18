@@ -45,6 +45,10 @@
 				$response = "";
 				$this->error = $ex->getMessage();
 				return [];
+			} catch(\GuzzleHttp\Exception\ConnectException $ex) {
+				$response = "";
+				$this->error = 'failed to connect to Utopia client, timeout';
+				return [];
 			}
 			
 			if(! Utilities::isJson($response)) {
@@ -394,6 +398,7 @@
 				$this->error = 'empty pubkey given for sendEmailMessage method';
 				return false;
 			}
+      
 			$params = [
 				'to'      => [$pkOrNick],
 				'subject' => $subject,
