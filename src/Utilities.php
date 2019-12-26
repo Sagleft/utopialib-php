@@ -97,5 +97,21 @@
 			$hex = str_pad($hex, 6, "0");
 			return "#" . $hex;
 		}
+		
+		function verifyHEXstr($hex = '', $str_len = 32): bool {
+			if(strlen($hex) != $str_len || !ctype_xdigit($hex)) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
+		function verifyChannelID($channelID = ''): bool {
+			return Utilities::verifyHEXstr($channelID, 32);
+		}
+		
+		function verifyPubkey($pubkey = ''): bool {
+			return Utilities::verifyHEXstr($pubkey, 64);
+		}
 	}
 	
