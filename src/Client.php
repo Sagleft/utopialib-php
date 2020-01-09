@@ -1435,5 +1435,11 @@
 			}
 			return $response['result'];
 		}
+		
+		public function checkClientConnection(): bool {
+			$response = $this->getSystemInfo();
+			//return isset($response['result']);
+			return $this->checkResultContains($response);
+		}
 	}
 	
