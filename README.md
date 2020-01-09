@@ -1,6 +1,5 @@
 
-UtopiaLib
-==========
+![logo](https://github.com/Sagleft/utopialib-php/raw/master/img/logo.png)
 
 PHP library for Utopia Network API.
 
