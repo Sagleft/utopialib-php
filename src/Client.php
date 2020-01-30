@@ -137,7 +137,11 @@
 		}
 		
 		public function getOwnContact(): array {
-			return $this->api_query("getOwnContact");
+			$response = $this->api_query("getOwnContact");
+			if(! $this->checkResultContains($response)) {
+				return [];
+			}
+			return $response['result'];
 		}
 		
 		public function getContacts($search_filter = "", $query_filter = null): array {
