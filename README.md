@@ -48,6 +48,17 @@ Array
 
 You can find out more about all the methods [in the interface of the main class.](src/ClientInterface.php)
 
+For convenience, all methods in the library have the same names as in the Utopia API.
+
+Additional methods:
+* checkClientConnection(): bool;
+* isUserMyContact($pkOrNick): bool;
+* getNetworkSummary(): array;
+* isCryptonEngineReady(): bool;
+* isNATDetectionON(): bool;
+* isUPNPDetectionON(): bool;
+* isChannelDatabaseReady(): bool;
+
 License
 -------
 

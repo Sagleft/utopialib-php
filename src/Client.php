@@ -1445,5 +1445,66 @@
 			//return isset($response['result']);
 			return $this->checkResultContains($response);
 		}
+
+		public function getNetworkSummary(): array {
+			$response = $this->api_query('getNetworkConnections');
+			if(! $this->checkResultContains($response)) {
+				return [];
+			}
+			if(! isset($response['result']['summary'])) {
+				return [];
+			} else {
+				return $response['result']['summary'];
+			}
+		}
+		
+		function getNetworkSummaryBool($var_name = 'NAT_detection'): bool {
+			$network_summary = $this->getNetworkSummary();
+			if($network_summary == []) {
+				return false;
+			}
+			if(!isset($network_summary[$var_name])) {
+				return false;
+			} else {
+				switch($network_summary[$var_name]) {
+					default:
+						return false;
+					case 1:
+						return true;
+				}
+			}
+		}
+
+		public function isCryptonEngineReady(): bool {
+			return $this->getNetworkSummaryBool('crypton_engine_status');
+		}
+
+		public function isNATDetectionON(): bool {
+			return $this->getNetworkSummaryBool('NAT_detection');
+		}
+		
+		public function isUPNPDetectionON(): bool {
+			return $this->getNetworkSummaryBool('UPNP_detection');
+		}
+		
+		public function isChannelDatabaseReady(): bool {
+			return ! $this->getNetworkSummaryBool('channel_database_sync_status');
+		}
+
+		public function getTransfersFromManager(): array {
+			$response = $this->api_query('getTransfersFromManager');
+			if(! $this->checkResultContains($response)) {
+				return [];
+			}
+			return $response['result'];
+		}
+		
+		public function getFilesFromManager(): array {
+			$response = $this->api_query('getFilesFromManager');
+			if(! $this->checkResultContains($response)) {
+				return [];
+			}
+			return $response['result'];
+		}
 	}
 	
