@@ -2,7 +2,7 @@
     "name": "sagleft/utopialib-php",
     "description": "PHP library for Utopia Network API",
     "keywords": ["utopia", "lib", "php"],
-    "version": "1.0.14",
+    "version": "1.0.15",
     "license" : "MIT",
     "authors" : [
         {
