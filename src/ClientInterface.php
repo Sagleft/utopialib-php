@@ -350,5 +350,163 @@
 			* @return bool
 		*/
 		public function statusHistoryMining(): int;
+
+		public function getMiningBlocks($query_filter = null): array;
+		
+		public function getMiningInfo(): array;
+		
+		public function getVouchers($query_filter = null): array;
+		
+		public function createVoucher($amount = 1): string;
+		
+		public function useVoucher($voucherid = ''): string;
+		
+		public function deleteVoucher($voucherid = ''): string;
+		
+		public function getInvoices($cardId = '', $invoiceId = '', $pk = '', $transactionId = '', $status = '', $startDateTime = '', $endDateTime = '', $referenceNumber = ''): array;
+		
+		public function getInvoiceByReferenceNumber($referenceNumber = null): string;
+		
+		public function getTransactionIdByReferenceNumber($referenceNumber = null);
+		
+		public function sendInvoice($cardid = '', $amount = 1, $comment = ''): string;
+		
+		public function acceptInvoice($invoiceid = ''): string;
+		
+		public function declineInvoice($invoiceid = ''): string;
+		
+		public function cancelInvoice($invoiceid = '');
+		
+		public function requestUnsTransfer($name, $hexNewOwnerPk): string;
+		
+		public function acceptUnsTransfer($requestId = "123"): string;
+		
+		public function declineUnsTransfer($requestId = "123"): string;
+		
+		public function incomingUnsTransfer($query_filter = null): array;
+		
+		public function outgoingUnsTransfer($query_filter = null): array;
+		
+		public function storageWipe(): bool;
+		
+		public function sendAuthorizationRequest($pk, $message = "auth request"): bool;
+		
+		public function acceptAuthorizationRequest($pk, $message = "request accepted"): bool;
+		
+		public function rejectAuthorizationRequest($pk, $message = "request rejected"): bool;
+		
+		public function deleteContact($pk): bool;
+		
+		public function getChannels($search_filter = '', $channel_type = 0, $query_filter = null): array;
+		
+		public function sendChannelMessage($channelid, $message = "test message"): string;
+		
+		public function sendChannelPicture($channelid, $base64_image = '', $filename_image = ''): string;
+		
+		public function joinChannel($channelid, $password = ''): bool;
+		
+		public function leaveChannel($channelid): bool;
+		
+		public function getChannelMessages($channelid, $query_filter = null);
+		
+		public function getChannelInfo($channelid): array;
+		
+		public function getChannelModerators($channelid): array;
+		
+		public function getChannelContacts($channelid): array;
+		
+		public function getChannelModeratorRight($channelid, $moderator = "1");
+		
+		public function createChannel($channel_name = "my channel", $description = '', $read_only = '', $read_only_privacy = '', $password = '', $languages = '', $hashtags = '', $geoTag = '', $base64_avatar_image = '', $hide_in_UI = ''): string;
+		
+		public function modifyChannel($channelid, $description = null, $read_only = null, $read_only_privacy = null, $languages = null, $hashtags = null, $geoTag = null, $base64_avatar_image = null, $hide_in_UI = null): string;
+		
+		public function modifyChannelDescription($channelid, $description = null): string;
+		
+		public function modifyChannelReadOnlyPrivacy($channelid, $read_only_privacy = null): string;
+		
+		public function modifyChannelLanguages($channelid, $languages = null): string;
+		
+		public function modifyChannelHashtags($channelid, $hashtags = null): string;
+		
+		public function modifyChannelGeoTag($channelid, $geoTag = null): string;
+		
+		public function modifyChannelAvatar($channelid, $base64_avatar_image = null): string;
+		
+		public function modifyChannelHideInUI($channelid, $hide_in_UI = null): string;
+		
+		public function deleteChannel($channelid): bool;
+		
+		public function getChannelSystemInfo(): array;
+		
+		public function unsCreateRecordRequest($nick, $validUnilDate = "2048-12-02", $isPrimary = false, $channelId = null): string;
+		
+		public function unsModifyRecordRequest($nick, $validUnilDate = null, $isPrimary = null, $channelId = null): string;
+		
+		public function unsDeleteRecordRequest($nick): string;
+		
+		public function unsSearchByPk($pk, $query_filter = null): array;
+		
+		public function unsSearchByNick($nick, $query_filter = null): array;
+		
+		public function getUnsSyncInfo(): array;
+		
+		public function unsRegisteredNames($query_filter = null): array;
+		
+		public function summaryUnsRegisteredNames($date_from, $date_to, $query_filter = null): array;
+		
+		public function clearTrayNotifications(): bool;
+		
+		public function getNetworkConnections($query_filter = null): array;
+		
+		public function getProxyMappings($query_filter = null): array;
+		
+		public function createProxyMapping($srcHost, $srcPort = 80, $dstHost = "127.0.0.1", $dstPort = 80, $enabled = true): int;
+		
+		public function enableProxyMapping($mappingId): bool;
+		
+		public function disableProxyMapping($mappingId): bool;
+		
+		public function removeProxyMapping($mappingId): bool;
+		
+		public function lowTrafficMode(): bool;
+		
+		public function setLowTrafficMode($enabled = true): bool;
+		
+		public function getWhoIsInfo($pkOrNick): array;
+		
+		public function isUserMyContact($pkOrNick): bool;
+		
+		public function requestTreasuryInterestRates(): bool;
+		
+		public function getTreasuryInterestRates(): array;
+		
+		public function requestTreasuryTransactionVolumes(): bool;
+		
+		public function getTreasuryTransactionVolumes($query_filter = null): array;
+		
+		public function ucodeEncode($hex_code, $size_image = 128, $coder = 'BASE64', $format = "JPG"): string;
+		
+		public function ucodeDecode($base64_image): array;
+		
+		public function getWebSocketState(): int;
+		
+		public function setWebSocketState($enabled = "false", $port = "226748"): int;
+		
+		public function checkClientConnection(): bool;
+		
+		public function getNetworkSummary(): array;
+		
+		public function isCryptonEngineReady(): bool;
+		
+		public function isNATDetectionON(): bool;
+		
+		public function isUPNPDetectionON(): bool;
+		
+		public function isChannelDatabaseReady(): bool;
+		
+		public function getTransfersFromManager(): array;
+		
+		public function getFilesFromManager(): array;
 	}
 	
