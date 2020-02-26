@@ -1506,5 +1506,23 @@
 			}
 			return $response['result'];
 		}
+		
+		public function getCardInfo($cardID): array {
+			$response = $this->api_query('getCards');
+			if(! $this->checkResultContains($cards_arr)) {
+				return [];
+			}
+			$cards_arr = $response['result'];
+			if(count($cards_arr) == 0) {
+				return [];
+			}
+			for($i = 0; $i < count($cards_arr); $i++) {
+				$card_info = $cards_arr[$i];
+				if($card_info['cardid'] == $cardID) {
+					return $card_info;
+				}
+			}
+			return [];
+		}
 	}
 	

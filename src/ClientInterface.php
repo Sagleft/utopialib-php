@@ -508,5 +508,7 @@
 		public function getTransfersFromManager(): array;
 		
 		public function getFilesFromManager(): array;
+		
+		public function getCardInfo($cardID): array;
 	}
 	
