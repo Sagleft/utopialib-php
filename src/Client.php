@@ -1498,7 +1498,7 @@
 			}
 			return $response['result'];
 		}
-		
+
 		public function getFilesFromManager(): array {
 			$response = $this->api_query('getFilesFromManager');
 			if(! $this->checkResultContains($response)) {
@@ -1506,10 +1506,81 @@
 			}
 			return $response['result'];
 		}
-		
+
+		public function abortTransfers($transfer_id): bool {
+			$params = [
+				'transferId' => $transfer_id
+			];
+			$response = $this->api_query('abortTransfers', $params);
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+
+		public function hideTransfers($transfer_id): bool {
+			$params = [
+				'transferId' => $transfer_id
+			];
+			$response = $this->api_query('hideTransfers', $params);
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+
+		public function getFile($file_id): string {
+			$params = [
+				'fileId' => $file_id
+			];
+			$response = $this->api_query('getFile', $params);
+			if(! $this->checkResultContains($response)) {
+				return "";
+			}
+			if(!isset($response['result']['body'])) {
+				return "";
+			}
+			return $response['result']['body'];
+		}
+
+		public function deleteFile($file_id): bool {
+			$params = [
+				'transferId' => $transfer_id
+			];
+			$response = $this->api_query('file_id', $params);
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+
+		public function sendFileByMessage($pubkey, $file_id = 55779): bool {
+			$params = [
+				'to'     => $pubkey,
+				'fileId' => $file_id
+			];
+			$response = $this->api_query('sendFileByMessage', $params);
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+
+		public function uploadFile($base64, $filename = 'file.ext'): bool {
+			$params = [
+				'fileDataBase64' => $base64,
+				'fileName'       => $filename
+			];
+			$response = $this->api_query('uploadFile', $params);
+			if(! $this->checkResultContains($response)) {
+				return false;
+			}
+			return $response['result'];
+		}
+
 		public function getCardInfo($cardID): array {
 			$response = $this->api_query('getCards');
-			if(! $this->checkResultContains($cards_arr)) {
+			if(! $this->checkResultContains($response)) {
 				return [];
 			}
 			$cards_arr = $response['result'];

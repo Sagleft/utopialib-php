@@ -509,6 +509,18 @@
 		
 		public function getFilesFromManager(): array;
 		
+		public function abortTransfers($transfer_id): bool;
+		
+		public function hideTransfers($transfer_id): bool;
+		
+		public function getFile($file_id): string;
+		
+		public function deleteFile($file_id): bool;
+		
+		public function sendFileByMessage($pubkey, $file_id): bool;
+		
+		public function uploadFile($base64, $filename): bool;
+		
 		public function getCardInfo($cardID): array;
 	}
 	
