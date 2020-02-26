@@ -5,12 +5,12 @@
 		public $error = ''; //last error
 		public $last_response = ''; //for debug
 
-		private $api_port    = 22659;
-		private $api_host    = '';
-		private $api_token   = '';
-		private $api_version = '1.0';
-		private $client = null; //Graze\GuzzleHttp\JsonRpc\Client
-		private $is_debug = false;
+		protected $api_port    = 22659;
+		protected $api_host    = '';
+		protected $api_token   = '';
+		protected $api_version = '1.0';
+		protected $client   = null; //Graze\GuzzleHttp\JsonRpc\Client
+		protected $is_debug = false;
 
 		public function __construct($token = '', $host = 'http://127.0.0.1', $port = 22659) {
 			$this->api_token = $token;
@@ -19,11 +19,11 @@
 			$this->init();
 		}
 
-		private function getApiUrl() {
+		protected function getApiUrl() {
 			return $this->api_host . ':' . $this->api_port . '/api/' . $this->api_version;
 		}
 
-		private function api_query($method = "getSystemInfo", $params = [], $filter = null): array {
+		protected function api_query($method = "getSystemInfo", $params = [], $filter = null): array {
 			//filter - \Utopia\Filter object
 			$this->error = '';
 			$query_body = [
@@ -60,20 +60,20 @@
 			return json_decode($response, true);
 		}
 
-		private function guzzleQuery($url, $query_body) {
+		protected function guzzleQuery($url, $query_body) {
 			$response = $this->client->request("POST", $url, [
 				'json' => $query_body
 			]);
 			return $response->getBody()->getContents();
 		}
 
-		private function init() {
+		protected function init() {
 			$this->client = new \GuzzleHttp\Client([
 				'timeout' => 2.0
 			]);
 		}
 
-		private function checkResultContains($response = []): bool {
+		protected function checkResultContains($response = []): bool {
 			if(!isset($response['result'])) {
 				if(isset($response['error'])) {
 					$this->error = $response['error'];
@@ -88,7 +88,7 @@
 			return true;
 		}
 
-		private function checkResultBool($value): bool {
+		protected function checkResultBool($value): bool {
 			if(!is_bool($value)) {
 				$this->error = "'result' contains " . gettype($value) . " expected bool";
 				if($this->is_debug) {
@@ -97,6 +97,13 @@
 				return false;
 			}
 			return true;
+		}
+		
+		function checkResultVar($response = '', $byDefault = '') {
+			if(! $this->checkResultContains($response)) {
+				return $byDefault;
+			}
+			return $response['result'];
 		}
 
 		public function setDebugMode($is_debug = true) {
@@ -138,10 +145,11 @@
 
 		public function getOwnContact(): array {
 			$response = $this->api_query('getOwnContact');
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			//if(! $this->checkResultContains($response)) {
+			//	return [];
+			//}
+			//return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getContacts($search_filter = '', $query_filter = null): array {
@@ -149,10 +157,7 @@
 				'filter' => $search_filter
 			];
 			$response = $this->api_query('getContacts', $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getContactAvatar($pk = '', $coder = 'BASE64', $format = 'PNG'): string {
@@ -178,10 +183,7 @@
 				'format' => $format
 			];
 			$response = $this->api_query('getContactAvatar', $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, '');
 		}
 
 		public function getChannelAvatar($channelid = '', $coder = 'BASE64', $format = 'PNG'): string {
@@ -207,10 +209,7 @@
 				'format'    => $format
 			];
 			$response = $this->api_query('getChannelAvatar', $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, '');
 		}
 
 		public function setContactGroup($pk = '', $groupName = ''): bool {
@@ -313,10 +312,7 @@
 
 		public function getStickerCollections(): array {
 			$response = $this->api_query('getStickerCollections');
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getStickerNamesByCollection($collection_name = 'Default Stickers'): array {
@@ -324,10 +320,7 @@
 				'collection_name' => $collection_name
 			];
 			$response = $this->api_query('getStickerNamesByCollection', $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getImageSticker($collection_name = "Default Stickers", $sticker_name = "airship", $coder = 'BASE64'): string {
@@ -343,10 +336,7 @@
 				'coder'           => $coder
 			];
 			$response = $this->api_query("getImageSticker", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, '');
 		}
 
 		public function sendInstantBuzz($pkOrNick = '', $comments = "test"): int {
@@ -355,10 +345,7 @@
 				'comments' => $comments
 			];
 			$response = $this->api_query("sendInstantBuzz", $params);
-			if(! $this->checkResultContains($response)) {
-				return 0;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, 0);
 		}
 
 		public function sendInstantInvitation($pkOrNick, $channelid, $description, $comments): int {
@@ -369,10 +356,7 @@
 				'comments'    => $comments
 			];
 			$response = $this->api_query("sendInstantInvitation", $params);
-			if(! $this->checkResultContains($response)) {
-				return 0;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, 0);
 		}
 
 		public function removeInstantMessages($pk = ''): bool {
@@ -380,10 +364,7 @@
 				'hex_contact_public_key' => $pkOrNick
 			];
 			$response = $this->api_query("sendInstantInvitation", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getContactMessages($pk, $query_filter = null): array {
@@ -391,10 +372,7 @@
 				'pk' => $pk
 			];
 			$response = $this->api_query("getContactMessages", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function sendEmailMessage($pkOrNick = '', $subject = 'test message', $body = 'message content'): bool {
@@ -409,10 +387,7 @@
 				'body'    => $body
 			];
 			$response = $this->api_query("sendEmailMessage", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function sendManyEmailMessages($pk_arr = [], $subject = "test message", $body = "message content"): bool {
@@ -422,10 +397,7 @@
 				'body'    => $body
 			];
 			$response = $this->api_query("sendEmailMessage", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function sendPayment($cardid = '', $pkOrNick = '', $amount = 1, $comment = '', $fromCard = ''): string {
@@ -441,10 +413,7 @@
 				$params['comment'] = $comment;
 			}
 			$response = $this->api_query("sendPayment", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, '');
 		}
 
 		public function getEmailFolder($folderType = 1, $search_filter = '', $query_filter = null): array {
@@ -453,10 +422,7 @@
 				'filter'     => $search_filter
 			];
 			$response = $this->api_query("getEmailFolder", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getEmails($folderType = 1, $search_filter = '', $query_filter = null): array {
@@ -465,10 +431,7 @@
 				'filter'     => $search_filter
 			];
 			$response = $this->api_query("getEmails", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getEmailById($id = 33): array {
@@ -476,10 +439,7 @@
 				'id' => $id
 			];
 			$response = $this->api_query("getEmailById", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function deleteEmail($id = 33): bool {
@@ -487,10 +447,7 @@
 				'id' => $id
 			];
 			$response = $this->api_query("deleteEmail", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function sendReplyEmailMessage($id = 33, $body = "my message", $subject = "uMail subject"): bool {
@@ -500,10 +457,7 @@
 				'subject' => $subject
 			];
 			$response = $this->api_query("sendReplyEmailMessage", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function sendForwardEmailMessage($id = 33, $pkOrNick = '', $body = "my message", $subject = "uMail subject"): bool {
@@ -514,26 +468,17 @@
 				'subject' => $subject
 			];
 			$response = $this->api_query("sendForwardEmailMessage", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getFinanceSystemInformation(): array {
 			$response = $this->api_query("getFinanceSystemInformation");
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getBalance(): float {
 			$response = $this->api_query("getBalance");
-			if(! $this->checkResultContains($response)) {
-				return 0;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, 0);
 		}
 
 		public function getFinanceHistory($filters = "ALL_TRANSFERS", $referenceNumber = '', $toDate = '', $fromDate = '', $batchId = '', $fromAmount = '', $toAmount = '', $query_filter = null): array {
@@ -548,18 +493,12 @@
 				'toAmount'        => $toAmount
 			];
 			$response = $this->api_query("getFinanceHistory", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getCards(): array {
 			$response = $this->api_query("getCards");
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function addCard($name = "new card", $color = "#FFFFFF", $numbers = "0000"): string {
@@ -571,10 +510,7 @@
 			];
 			//TODO: filter $numbers
 			$response = $this->api_query("addCard", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, '');
 		}
 
 		public function deleteCard($cardId = ''): bool {
@@ -586,10 +522,7 @@
 				'cardId' => $cardId
 			];
 			$response = $this->api_query("deleteCard", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function enableMining($enabled = true): bool {
@@ -601,11 +534,7 @@
 				'enabled' => $enabled
 			];
 			$response = $this->api_query("enableMining", $params);
-			//exit(json_encode($response));
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function enableInterest($enabled = true): bool {
@@ -617,10 +546,7 @@
 				'enabled' => $enabled
 			];
 			$response = $this->api_query("enableInterest", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function enableHistoryMining($enabled = true): bool {
@@ -632,42 +558,27 @@
 				'enabled' => $enabled
 			];
 			$response = $this->api_query("enableHistoryMining", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function statusHistoryMining(): int {
 			$response = $this->api_query("statusHistoryMining");
-			if(! $this->checkResultContains($response)) {
-				return 0;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, 0);
 		}
 
 		public function getMiningBlocks($query_filter = null): array {
 			$response = $this->api_query("getMiningBlocks", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getMiningInfo(): array {
 			$response = $this->api_query("getMiningBlocks");
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getVouchers($query_filter = null): array {
 			$response = $this->api_query("getVouchers");
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function createVoucher($amount = 1): string {
@@ -678,38 +589,29 @@
 				'amount' => $amount
 			];
 			$response = $this->api_query("createVoucher", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, '');
 		}
 
 		public function useVoucher($voucherid = ''): string {
-			if($voucherid == "") {
+			if($voucherid == '') {
 				return '';
 			}
 			$params = [
 				'voucherid' => $voucherid
 			];
-			$response = $this->api_query("useVoucher", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('useVoucher', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function deleteVoucher($voucherid = ''): string {
-			if($voucherid == "") {
+			if($voucherid == '') {
 				return '';
 			}
 			$params = [
 				'voucherid' => $voucherid
 			];
-			$response = $this->api_query("deleteVoucher", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('deleteVoucher', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function getInvoices($cardId = '', $invoiceId = '', $pk = '', $transactionId = '', $status = '', $startDateTime = '', $endDateTime = '', $referenceNumber = ''): array {
@@ -723,11 +625,8 @@
 				'endDateTime'     => $endDateTime,
 				'referenceNumber' => $referenceNumber,
 			];
-			$response = $this->api_query("getInvoices", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getInvoices', $params);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getInvoiceByReferenceNumber($referenceNumber = null): string {
@@ -736,11 +635,8 @@
 				$params['referenceNumber'] = $referenceNumber;
 			}
 	
-			$response = $this->api_query("getInvoiceByReferenceNumber", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getInvoiceByReferenceNumber', $params);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getTransactionIdByReferenceNumber($referenceNumber = null) {
@@ -748,11 +644,8 @@
 			if($referenceNumber != null) {
 				$params['referenceNumber'] = $referenceNumber;
 			}
-			$response = $this->api_query("getTransactionIdByReferenceNumber", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getTransactionIdByReferenceNumber', $params);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function sendInvoice($cardid = '', $amount = 1, $comment = ''): string {
@@ -761,44 +654,32 @@
 				'amount'  => $amount,
 				'comment' => $comment
 			];
-			$response = $this->api_query("sendInvoice", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('sendInvoice', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function acceptInvoice($invoiceid = ''): string {
 			$params = [
 				'invoiceid' => $invoiceid
 			];
-			$response = $this->api_query("acceptInvoice", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('acceptInvoice', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function declineInvoice($invoiceid = ''): string {
 			$params = [
 				'invoiceid' => $invoiceid
 			];
-			$response = $this->api_query("declineInvoice", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('declineInvoice', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function cancelInvoice($invoiceid = '') {
 			$params = [
 				'invoiceid' => $invoiceid
 			];
-			$response = $this->api_query("cancelInvoice", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('cancelInvoice', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function requestUnsTransfer($name, $hexNewOwnerPk): string {
@@ -807,107 +688,77 @@
 				'hexNewOwnerPk' => $hexNewOwnerPk
 			];
 			if(! ctype_xdigit($hexNewOwnerPk)) {
-				$this->error = "expected hex parameter (requestUnsTransfer method)";
+				$this->error = 'expected hex parameter (requestUnsTransfer method)';
 				return '';
 			}
-			$response = $this->api_query("requestUnsTransfer", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('requestUnsTransfer', $params);
+			return $this->checkResultVar($response, '');
 		}
 
-		public function acceptUnsTransfer($requestId = "123"): string {
+		public function acceptUnsTransfer($requestId = '123'): string {
 			$params = [
 				'requestId' => $requestId
 			];
-			$response = $this->api_query("acceptUnsTransfer", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('acceptUnsTransfer', $params);
+			return $this->checkResultVar($response, '');
 		}
 
-		public function declineUnsTransfer($requestId = "123"): string {
+		public function declineUnsTransfer($requestId = '123'): string {
 			$params = [
 				'requestId' => $requestId
 			];
-			$response = $this->api_query("declineUnsTransfer", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('declineUnsTransfer', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function incomingUnsTransfer($query_filter = null): array {
-			$response = $this->api_query("incomingUnsTransfer", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('incomingUnsTransfer', [], $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function outgoingUnsTransfer($query_filter = null): array {
-			$response = $this->api_query("outgoingUnsTransfer", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('outgoingUnsTransfer', [], $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function storageWipe(): bool {
-			$response = $this->api_query("storageWipe");
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('storageWipe');
+			return $this->checkResultVar($response, []);
 		}
 
-		public function sendAuthorizationRequest($pk, $message = "auth request"): bool {
+		public function sendAuthorizationRequest($pk, $message = 'auth request'): bool {
 			$params = [
 				'pk'      => $pk,
 				'message' => $message
 			];
-			$response = $this->api_query("sendAuthorizationRequest", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('sendAuthorizationRequest', $params);
+			return $this->checkResultVar($response, false);
 		}
 
-		public function acceptAuthorizationRequest($pk, $message = "request accepted"): bool {
+		public function acceptAuthorizationRequest($pk, $message = 'request accepted'): bool {
 			$params = [
 				'pk'      => $pk,
 				'message' => $message
 			];
-			$response = $this->api_query("acceptAuthorizationRequest", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('acceptAuthorizationRequest', $params);
+			return $this->checkResultVar($response, false);
 		}
 
-		public function rejectAuthorizationRequest($pk, $message = "request rejected"): bool {
+		public function rejectAuthorizationRequest($pk, $message = 'request rejected'): bool {
 			$params = [
 				'pk'      => $pk,
 				'message' => $message
 			];
-			$response = $this->api_query("rejectAuthorizationRequest", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('rejectAuthorizationRequest', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function deleteContact($pk): bool {
 			$params = [
 				'pk' => $pk
 			];
-			$response = $this->api_query("deleteContact", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('deleteContact', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getChannels($search_filter = '', $channel_type = 0, $query_filter = null): array {
@@ -915,23 +766,17 @@
 				'filter'       => $search_filter,
 				'channel_type' => $channel_type
 			];
-			$response = $this->api_query("getChannels", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getChannels', $params, $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
-		public function sendChannelMessage($channelid, $message = "test message"): string {
+		public function sendChannelMessage($channelid, $message = 'test message'): string {
 			$params = [
 				'channelid' => $channelid,
 				'message'   => $message
 			];
-			$response = $this->api_query("sendChannelMessage", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('sendChannelMessage', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function sendChannelPicture($channelid, $base64_image = '', $filename_image = ''): string {
@@ -940,11 +785,8 @@
 				'base64_image'   => $base64_image,
 				'filename_image' => $filename_image
 			];
-			$response = $this->api_query("sendChannelPicture", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('sendChannelPicture', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function joinChannel($channelid, $password = ''): bool {
@@ -952,81 +794,60 @@
 				'ident'    => $channelid,
 				'password' => $password
 			];
-			$response = $this->api_query("joinChannel", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('joinChannel', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function leaveChannel($channelid): bool {
 			$params = [
 				'channelid' => $channelid
 			];
-			$response = $this->api_query("leaveChannel", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('leaveChannel', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getChannelMessages($channelid, $query_filter = null) {
 			$params = [
 				'channelid' => $channelid
 			];
-			$response = $this->api_query("getChannelMessages", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getChannelMessages', $params, $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getChannelInfo($channelid): array {
 			$params = [
 				'channelid' => $channelid
 			];
-			$response = $this->api_query("getChannelInfo", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getChannelInfo', $params);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getChannelModerators($channelid): array {
 			$params = [
 				'channelid' => $channelid
 			];
-			$response = $this->api_query("getChannelModerators", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getChannelModerators', $params);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getChannelContacts($channelid): array {
 			$params = [
 				'channelid' => $channelid
 			];
-			$response = $this->api_query("getChannelContacts", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getChannelContacts', $params);
+			return $this->checkResultVar($response, []);
 		}
 
-		public function getChannelModeratorRight($channelid, $moderator = "1") {
+		public function getChannelModeratorRight($channelid, $moderator = '1') {
 			$params = [
 				'channelid' => $channelid,
 				'moderator' => $moderator
 			];
-			$response = $this->api_query("getChannelModeratorRight", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getChannelModeratorRight', $params);
+			return $this->checkResultVar($response, []);
 		}
 
-		public function createChannel($channel_name = "my channel", $description = '', $read_only = '', $read_only_privacy = '', $password = '', $languages = '', $hashtags = '', $geoTag = '', $base64_avatar_image = '', $hide_in_UI = ''): string {
+		public function createChannel($channel_name = 'my channel', $description = '', $read_only = '', $read_only_privacy = '', $password = '', $languages = '', $hashtags = '', $geoTag = '', $base64_avatar_image = '', $hide_in_UI = ''): string {
 			$params = [
 				'channel_name'        => $channel_name,
 				'description'         => $description,
@@ -1039,11 +860,8 @@
 				'base64_avatar_image' => $base64_avatar_image,
 				'hide_in_UI'          => $hide_in_UI
 			];
-			$response = $this->api_query("createChannel", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('createChannel', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function modifyChannel($channelid, $description = null, $read_only = null, $read_only_privacy = null, $languages = null, $hashtags = null, $geoTag = null, $base64_avatar_image = null, $hide_in_UI = null): string {
@@ -1074,11 +892,8 @@
 			if($hide_in_UI != null) {
 				$params['hide_in_UI'] = $hide_in_UI;
 			}
-			$response = $this->api_query("modifyChannel", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('modifyChannel', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function modifyChannelDescription($channelid, $description = null): string {
@@ -1117,19 +932,13 @@
 			$params = [
 				'channelid' => $channelid
 			];
-			$response = $this->api_query("deleteChannel", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('deleteChannel', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getChannelSystemInfo(): array {
-			$response = $this->api_query("getChannelSystemInfo");
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getChannelSystemInfo');
+			return $this->checkResultVar($response, []);
 		}
 
 		public function unsCreateRecordRequest($nick, $validUnilDate = "2048-12-02", $isPrimary = false, $channelId = null): string {
@@ -1141,11 +950,8 @@
 			if($channelId != null) {
 				$params['channelId'] = $channelId;
 			}
-			$response = $this->api_query("unsCreateRecordRequest", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('unsCreateRecordRequest', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function unsModifyRecordRequest($nick, $validUnilDate = null, $isPrimary = null, $channelId = null): string {
@@ -1158,60 +964,42 @@
 			if($isPrimary != null) {
 				$params['isPrimary'] = $isPrimary;
 			}
-			$response = $this->api_query("unsModifyRecordRequest", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('unsModifyRecordRequest', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function unsDeleteRecordRequest($nick): string {
 			$params = [
 				'nick' => $nick
 			];
-			$response = $this->api_query("unsDeleteRecordRequest", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('unsDeleteRecordRequest', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function unsSearchByPk($pk, $query_filter = null): array {
 			$params = [
 				'filter' => $pk
 			];
-			$response = $this->api_query("unsSearchByPk", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('unsSearchByPk', $params, $query_filter);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function unsSearchByNick($nick, $query_filter = null): array {
 			$params = [
 				'filter' => $nick
 			];
-			$response = $this->api_query("unsSearchByNick", $params, $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('unsSearchByNick', $params, $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getUnsSyncInfo(): array {
-			$response = $this->api_query("getUnsSyncInfo");
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getUnsSyncInfo');
+			return $this->checkResultVar($response, []);
 		}
 
 		public function unsRegisteredNames($query_filter = null): array {
-			$response = $this->api_query("unsRegisteredNames", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('unsRegisteredNames', [], $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function summaryUnsRegisteredNames($date_from, $date_to, $query_filter = null): array {
@@ -1219,38 +1007,26 @@
 				'fromDate' => $date_from,
 				'toDate'   => $query_filter
 			];
-			$response = $this->api_query("unsRegisteredNames", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('unsRegisteredNames', [], $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function clearTrayNotifications(): bool {
-			$response = $this->api_query("clearTrayNotifications");
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('clearTrayNotifications');
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getNetworkConnections($query_filter = null): array {
-			$response = $this->api_query("getNetworkConnections", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getNetworkConnections', [], $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getProxyMappings($query_filter = null): array {
-			$response = $this->api_query("getProxyMappings", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getProxyMappings', [], $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
-		public function createProxyMapping($srcHost, $srcPort = 80, $dstHost = "127.0.0.1", $dstPort = 80, $enabled = true): int {
+		public function createProxyMapping($srcHost, $srcPort = 80, $dstHost = '127.0.0.1', $dstPort = 80, $enabled = true): int {
 			$params = [
 				'srcHost' => $srcHost,
 				'srcPort' => $srcPort,
@@ -1258,74 +1034,53 @@
 				'dstPort' => $dstPort,
 				'enabled' => $enabled
 			];
-			$response = $this->api_query("createProxyMapping", $params);
-			if(! $this->checkResultContains($response)) {
-				return 0;
-			}
-			return $response['result'];
+			$response = $this->api_query('createProxyMapping', $params);
+			return $this->checkResultVar($response, 0);
 		}
 
 		public function enableProxyMapping($mappingId): bool {
 			$params = [
 				'mappingId' => $mappingId
 			];
-			$response = $this->api_query("enableProxyMapping", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('enableProxyMapping', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function disableProxyMapping($mappingId): bool {
 			$params = [
 				'mappingId' => $mappingId
 			];
-			$response = $this->api_query("disableProxyMapping", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('disableProxyMapping', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function removeProxyMapping($mappingId): bool {
 			$params = [
 				'mappingId' => $mappingId
 			];
-			$response = $this->api_query("removeProxyMapping", $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('removeProxyMapping', $params);
+			return $this->checkResultVar($response, false);
 		}
 
 		public function lowTrafficMode(): bool {
-			$response = $this->api_query("lowTrafficMode");
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('lowTrafficMode');
+			return $this->checkResultVar($response, false);
 		}
 
 		public function setLowTrafficMode($enabled = true): bool {
 			$params = [
 				'enabled' => $enabled
 			];
-			$response = $this->api_query("setLowTrafficMode");
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('setLowTrafficMode');
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getWhoIsInfo($pkOrNick): array {
 			$params = [
 				'owner' => $pkOrNick
 			];
-			$response = $this->api_query("getWhoIsInfo", $params);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getWhoIsInfo', $params);
+			return $this->checkResultVar($response, []);
 		}
 
 		public function isUserMyContact($pkOrNick): bool {
@@ -1348,40 +1103,28 @@
 		}
 
 		public function requestTreasuryInterestRates(): bool {
-			$response = $this->api_query("requestTreasuryInterestRates");
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('requestTreasuryInterestRates');
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getTreasuryInterestRates(): array {
-			$response = $this->api_query("getTreasuryInterestRates");
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getTreasuryInterestRates');
+			return $this->checkResultVar($response, []);
 		}
 
 		public function requestTreasuryTransactionVolumes(): bool {
-			$response = $this->api_query("requestTreasuryTransactionVolumes");
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			$response = $this->api_query('requestTreasuryTransactionVolumes');
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getTreasuryTransactionVolumes($query_filter = null): array {
-			$response = $this->api_query("getTreasuryTransactionVolumes", [], $query_filter);
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			$response = $this->api_query('getTreasuryTransactionVolumes', [], $query_filter);
+			return $this->checkResultVar($response, []);
 		}
 
-		public function ucodeEncode($hex_code, $size_image = 128, $coder = 'BASE64', $format = "JPG"): string {
+		public function ucodeEncode($hex_code, $size_image = 128, $coder = 'BASE64', $format = 'JPG'): string {
 			if(!ctype_xdigit($hex_code)) {
-				$this->error = "hex_code must be in hexadecimal representation";
+				$this->error = 'hex_code must be in hexadecimal representation';
 				return '';
 			}
 			switch($coder) {
@@ -1392,7 +1135,7 @@
 			}
 			switch($format) {
 				default:
-					$format = "JPG"; break;
+					$format = 'JPG'; break;
 				case 'JPG': break;
 				case 'PNG': break;
 			}
@@ -1402,47 +1145,34 @@
 				'coder'      => $coder,
 				'format'     => $format
 			];
-			$response = $this->api_query("ucodeEncode", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('ucodeEncode', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function ucodeDecode($base64_image): array {
 			$params = [
 				'base64_image' => $base64_image
 			];
-			$response = $this->api_query("ucodeDecode", $params);
-			if(! $this->checkResultContains($response)) {
-				return '';
-			}
-			return $response['result'];
+			$response = $this->api_query('ucodeDecode', $params);
+			return $this->checkResultVar($response, '');
 		}
 
 		public function getWebSocketState(): int {
-			$response = $this->api_query("getWebSocketState");
-			if(! $this->checkResultContains($response)) {
-				return 0;
-			}
-			return $response['result'];
+			$response = $this->api_query('getWebSocketState');
+			return $this->checkResultVar($response, 0);
 		}
 
-		public function setWebSocketState($enabled = "false", $port = "226748"): int {
+		public function setWebSocketState($enabled = 'false', $port = '226748'): int {
 			$params = [
 				'enabled' => (string) $enabled,
 				'port'    => $port
 			];
-			$response = $this->api_query("setWebSocketState");
-			if(! $this->checkResultContains($response)) {
-				return 0;
-			}
-			return $response['result'];
+			$response = $this->api_query('setWebSocketState');
+			return $this->checkResultVar($response, 0);
 		}
 
 		public function checkClientConnection(): bool {
 			$response = $this->getSystemInfo();
-			//return isset($response['result']);
 			return $this->checkResultContains($response);
 		}
 
@@ -1493,18 +1223,12 @@
 
 		public function getTransfersFromManager(): array {
 			$response = $this->api_query('getTransfersFromManager');
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function getFilesFromManager(): array {
 			$response = $this->api_query('getFilesFromManager');
-			if(! $this->checkResultContains($response)) {
-				return [];
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, []);
 		}
 
 		public function abortTransfers($transfer_id): bool {
@@ -1512,10 +1236,7 @@
 				'transferId' => $transfer_id
 			];
 			$response = $this->api_query('abortTransfers', $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function hideTransfers($transfer_id): bool {
@@ -1523,10 +1244,7 @@
 				'transferId' => $transfer_id
 			];
 			$response = $this->api_query('hideTransfers', $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getFile($file_id): string {
@@ -1535,10 +1253,10 @@
 			];
 			$response = $this->api_query('getFile', $params);
 			if(! $this->checkResultContains($response)) {
-				return "";
+				return '';
 			}
 			if(!isset($response['result']['body'])) {
-				return "";
+				return '';
 			}
 			return $response['result']['body'];
 		}
@@ -1548,10 +1266,7 @@
 				'transferId' => $transfer_id
 			];
 			$response = $this->api_query('file_id', $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function sendFileByMessage($pubkey, $file_id = 55779): bool {
@@ -1560,10 +1275,7 @@
 				'fileId' => $file_id
 			];
 			$response = $this->api_query('sendFileByMessage', $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function uploadFile($base64, $filename = 'file.ext'): bool {
@@ -1572,10 +1284,7 @@
 				'fileName'       => $filename
 			];
 			$response = $this->api_query('uploadFile', $params);
-			if(! $this->checkResultContains($response)) {
-				return false;
-			}
-			return $response['result'];
+			return $this->checkResultVar($response, false);
 		}
 
 		public function getCardInfo($cardID): array {
