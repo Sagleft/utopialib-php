@@ -58,6 +58,19 @@ Additional methods:
 * isNATDetectionON(): bool;
 * isUPNPDetectionON(): bool;
 * isChannelDatabaseReady(): bool;
+* getChannelDecription($channelid): string;
+* getChannelOwnerPubkey($channelid): string;
+* getChannelTitle($channelid): string;
+* getChannelType($channelid): string;
+* getNetworkChannelsCount(): int;
+* getTotalChannelsCount(): int;
+* getLastDownloadedChannelTitle(): string;
+* getMyPubkey(): string;
+* getMyNick(): string;
+* getMyAvatarHash(): string;
+* isPOSenabled(): bool;
+* findChannelsByPubkey($pubkey): array;
+* isNetworkEnabled(): bool;
 
 License
 -------
