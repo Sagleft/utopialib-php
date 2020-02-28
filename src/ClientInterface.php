@@ -522,5 +522,31 @@
 		public function uploadFile($base64, $filename): bool;
 		
 		public function getCardInfo($cardID): array;
+		
+		public function getChannelDecription($channelid): string;
+		
+		public function getChannelOwnerPubkey($channelid): string;
+		
+		public function getChannelTitle($channelid): string;
+		
+		public function getChannelType($channelid): string;
+		
+		public function getNetworkChannelsCount(): int;
+		
+		public function getTotalChannelsCount(): int;
+		
+		public function getLastDownloadedChannelTitle(): string;
+		
+		public function getMyPubkey(): string;
+		
+		public function getMyNick(): string;
+		
+		public function getMyAvatarHash(): string;
+		
+		public function isPOSenabled(): bool;
+		
+		public function findChannelsByPubkey($pubkey): array;
+		
+		public function isNetworkEnabled(): bool;
 	}
 	

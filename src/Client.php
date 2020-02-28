@@ -936,8 +936,11 @@
 			return $this->checkResultVar($response, false);
 		}
 
-		public function getChannelSystemInfo(): array {
-			$response = $this->api_query('getChannelSystemInfo');
+		public function getChannelSystemInfo($channelId = ''): array {
+			$params = [
+				'channelId' => $channelId
+			];
+			$response = $this->api_query('getChannelSystemInfo', $params);
 			return $this->checkResultVar($response, []);
 		}
 
@@ -1303,6 +1306,77 @@
 				}
 			}
 			return [];
+		}
+		
+		public function getChannelDecription($channelid): string {
+			$channel_info = $this->getChannelInfo();
+			if(isset($channel_info['description'])) {
+				return $channel_info['description'];
+			}
+			return '';
+		}
+		
+		public function getChannelOwnerPubkey($channelid): string {
+			$channel_info = $this->getChannelInfo();
+			if(isset($channel_info['owner'])) {
+				return $channel_info['owner'];
+			}
+			return '';
+		}
+		
+		public function getChannelTitle($channelid): string {
+			$channel_info = $this->getChannelInfo();
+			if(isset($channel_info['title'])) {
+				return $channel_info['title'];
+			}
+			return '';
+		}
+		
+		public function getChannelType($channelid): string {
+			$channel_info = $this->getChannelInfo();
+			if(isset($channel_info['type'])) {
+				return $channel_info['type'];
+			}
+			return '';
+		}
+		
+		public function getNetworkChannelsCount(): int {
+			$channels_systemInfo = $this->getChannelSystemInfo();
+			return $channels_systemInfo['network_channels'];
+		}
+		
+		public function getTotalChannelsCount(): int {
+			$channels_systemInfo = $this->getChannelSystemInfo();
+			return $channels_systemInfo['total_channels'];
+		}
+		
+		public function getLastDownloadedChannelTitle(): string {
+			$channels_systemInfo = $this->getChannelSystemInfo();
+			return $channels_systemInfo['last_downloaded_channel'];
+		}
+		
+		public function getMyPubkey(): string {
+			return $this->getOwnContact()['pk'];
+		}
+		
+		public function getMyNick(): string {
+			return $this->getOwnContact()['nick'];
+		}
+		
+		public function getMyAvatarHash(): string {
+			return $this->getOwnContact()['avatarMd5'];
+		}
+		
+		public function isPOSenabled(): bool {
+			return $this->getFinanceSystemInformation()['PoS'];
+		}
+		
+		public function findChannelsByPubkey($pubkey): array {
+			return $this->getWhoIsInfo($pubkey)['channels'];
+		}
+		
+		public function isNetworkEnabled(): bool {
+			return $this->getSystemInfo()['networkEnabled'];
 		}
 	}
 	
