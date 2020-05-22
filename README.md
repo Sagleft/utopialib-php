@@ -46,6 +46,22 @@ Array
 )
 ```
 
+How to run examples
+
+```bash
+cp example.env .env
+```
+
+Then enter your data in `.env` to connect to the client.
+Then open the `examples` folder.
+
+Example (in command line):
+
+```bash
+php CheckConnection.php
+```
+
+
 You can find out more about all the methods [in the interface of the main class.](src/ClientInterface.php)
 
 For convenience, all methods in the library have the same names as in the Utopia API.
