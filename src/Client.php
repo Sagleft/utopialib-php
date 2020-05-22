@@ -98,7 +98,7 @@
 			}
 			return true;
 		}
-		
+
 		function checkResultVar($response = '', $byDefault = '') {
 			if(! $this->checkResultContains($response)) {
 				return $byDefault;
@@ -380,7 +380,7 @@
 				$this->error = 'empty pubkey given for sendEmailMessage method';
 				return false;
 			}
-      
+
 			$params = [
 				'to'      => [$pkOrNick],
 				'subject' => $subject,
@@ -634,7 +634,7 @@
 			if($referenceNumber != null) {
 				$params['referenceNumber'] = $referenceNumber;
 			}
-	
+
 			$response = $this->api_query('getInvoiceByReferenceNumber', $params);
 			return $this->checkResultVar($response, []);
 		}
@@ -1089,7 +1089,7 @@
 		public function isUserMyContact($pkOrNick): bool {
 			$whois_info = $this->getWhoIsInfo($pkOrNick);
 			$general = $whois_info['general'];
-	
+
 			$is_known = false;
 			for($i = 0; $i < count($general); $i++) {
 				$line = $general[$i];
@@ -1190,7 +1190,7 @@
 				return $response['result']['summary'];
 			}
 		}
-		
+
 		function getNetworkSummaryBool($var_name = 'NAT_detection'): bool {
 			$network_summary = $this->getNetworkSummary();
 			if($network_summary == []) {
@@ -1215,11 +1215,11 @@
 		public function isNATDetectionON(): bool {
 			return $this->getNetworkSummaryBool('NAT_detection');
 		}
-		
+
 		public function isUPNPDetectionON(): bool {
 			return $this->getNetworkSummaryBool('UPNP_detection');
 		}
-		
+
 		public function isChannelDatabaseReady(): bool {
 			return ! $this->getNetworkSummaryBool('channel_database_sync_status');
 		}
@@ -1307,7 +1307,7 @@
 			}
 			return [];
 		}
-		
+
 		public function getChannelDecription($channelid): string {
 			$channel_info = $this->getChannelInfo();
 			if(isset($channel_info['description'])) {
@@ -1315,7 +1315,7 @@
 			}
 			return '';
 		}
-		
+
 		public function getChannelOwnerPubkey($channelid): string {
 			$channel_info = $this->getChannelInfo();
 			if(isset($channel_info['owner'])) {
@@ -1323,7 +1323,7 @@
 			}
 			return '';
 		}
-		
+
 		public function getChannelTitle($channelid): string {
 			$channel_info = $this->getChannelInfo();
 			if(isset($channel_info['title'])) {
@@ -1331,7 +1331,7 @@
 			}
 			return '';
 		}
-		
+
 		public function getChannelType($channelid): string {
 			$channel_info = $this->getChannelInfo();
 			if(isset($channel_info['type'])) {
@@ -1339,44 +1339,43 @@
 			}
 			return '';
 		}
-		
+
 		public function getNetworkChannelsCount(): int {
 			$channels_systemInfo = $this->getChannelSystemInfo();
 			return $channels_systemInfo['network_channels'];
 		}
-		
+
 		public function getTotalChannelsCount(): int {
 			$channels_systemInfo = $this->getChannelSystemInfo();
 			return $channels_systemInfo['total_channels'];
 		}
-		
+
 		public function getLastDownloadedChannelTitle(): string {
 			$channels_systemInfo = $this->getChannelSystemInfo();
 			return $channels_systemInfo['last_downloaded_channel'];
 		}
-		
+
 		public function getMyPubkey(): string {
 			return $this->getOwnContact()['pk'];
 		}
-		
+
 		public function getMyNick(): string {
 			return $this->getOwnContact()['nick'];
 		}
-		
+
 		public function getMyAvatarHash(): string {
 			return $this->getOwnContact()['avatarMd5'];
 		}
-		
+
 		public function isPOSenabled(): bool {
 			return $this->getFinanceSystemInformation()['PoS'];
 		}
-		
+
 		public function findChannelsByPubkey($pubkey): array {
 			return $this->getWhoIsInfo($pubkey)['channels'];
 		}
-		
+
 		public function isNetworkEnabled(): bool {
-			return $this->getSystemInfo()['networkEnabled'];
+			return $this->getSystemInfo()['result']['networkEnabled'];
 		}
 	}
-	
