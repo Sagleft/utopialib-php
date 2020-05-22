@@ -8,8 +8,10 @@
 		getenv('utopia_host'),
 		getenv('utopia_port')
 	);
-	
-	//filter to select 10 records without offset
-	$query_filter = new UtopiaLib\Filter('', '', 10);
+	$system_info = $client->getSystemInfo();
 
-	print_r($client->getChannels($query_filter));
+	if($system_info == []) {
+		echo 'last error: ' . $client->error;
+	} else {
+		print_r($system_info);
+	}

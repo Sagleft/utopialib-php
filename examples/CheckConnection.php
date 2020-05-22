@@ -1,10 +1,16 @@
 <?php
 	require_once __DIR__ . '/../vendor/autoload.php';
-	
-	$token = 'D075C9E46D5F20D10999911B6F10BB0B';
-	$client = new UtopiaLib\Client($token, "http://127.0.0.1", 22824);
-	//$client->setDebugMode(true);
-	
+
+	//data for connecting to the client are indicated in the file ../.env
+	//view ../README.md
+	new TestEnvironment();
+
+	$client = new UtopiaLib\Client(
+		getenv('utopia_token'),
+		getenv('utopia_host'),
+		getenv('utopia_port')
+	);
+
 	$result = $client->checkClientConnection();
 	if($result) {
 		echo 'Everything is OK, connection to the Utopia client is active';
@@ -13,4 +19,3 @@
 		echo 'Response: ' . $client->last_response . '. ' . PHP_EOL;
 		echo 'Last error: ' . $client->error . '. ' . PHP_EOL;
 	}
-	
