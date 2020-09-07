@@ -2,18 +2,18 @@
 	namespace UtopiaLib;
 	
 	class Utilities {
-		function isJson($string = ""): bool {
+		public static function isJson($string = ""): bool {
 			return ((is_string($string) && (is_object(json_decode($string)) || is_array(json_decode($string))))) ? true : false;
 		}
 		
-		function json_decode_nice($json = "", $assoc = FALSE){ 
+		public static function json_decode_nice($json = "", $assoc = FALSE){ 
 			$json = str_replace(["\n", "\r"], "", $json);
 			$json = preg_replace('/([{,]+)(\s*)([^"]+?)\s*:/','$1"$3":',$json);
 			$json = preg_replace('/(,)\s*}$/', '}', $json);
 			return json_decode($json, $assoc);
 		}
 		
-		function filterFolderType($folderType = 1) {
+		public static function filterFolderType($folderType = 1) {
 			switch($folderType) {
 				default:
 					$folderType = 1; break;
@@ -36,7 +36,7 @@
 			return $folderType;
 		}
 		
-		function parseFinanceQueryFilters($filters = "ALL_TRANSFERS"): string {
+		public static function parseFinanceQueryFilters($filters = "ALL_TRANSFERS"): string {
 			$delimiter = ',';
 			$filters_accepted = [
 				"ALL_CARDS",
@@ -84,7 +84,7 @@
 			}
 		}
 		
-		function filterHEXColor($color = "#ffffff"): string {
+		public static function filterHEXColor($color = "#ffffff"): string {
 			$color_default = "#ffffff";
 			if($color == "") {
 				return $color_default;
@@ -98,7 +98,7 @@
 			return "#" . $hex;
 		}
 		
-		function verifyHEXstr($hex = '', $str_len = 32): bool {
+		public static function verifyHEXstr($hex = '', $str_len = 32): bool {
 			if(strlen($hex) != $str_len || !ctype_xdigit($hex)) {
 				return false;
 			} else {
@@ -106,11 +106,11 @@
 			}
 		}
 		
-		function verifyChannelID($channelID = ''): bool {
+		public static function verifyChannelID($channelID = ''): bool {
 			return Utilities::verifyHEXstr($channelID, 32);
 		}
 		
-		function verifyPubkey($pubkey = ''): bool {
+		public static function verifyPubkey($pubkey = ''): bool {
 			return Utilities::verifyHEXstr($pubkey, 64);
 		}
 	}
