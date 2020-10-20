@@ -1281,13 +1281,13 @@
 			return $this->checkResultVar($response, false);
 		}
 
-		public function uploadFile($base64, $filename = 'file.ext'): bool {
+		public function uploadFile($base64, $filename = 'file.ext'): int {
 			$params = [
 				'fileDataBase64' => $base64,
 				'fileName'       => $filename
 			];
 			$response = $this->api_query('uploadFile', $params);
-			return $this->checkResultVar($response, false);
+			return $this->checkResultVar($response, 0);
 		}
 
 		public function getCardInfo($cardID): array {

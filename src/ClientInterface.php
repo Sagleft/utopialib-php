@@ -519,7 +519,7 @@
 
 		public function sendFileByMessage($pubkey, $file_id): bool;
 
-		public function uploadFile($base64, $filename): bool;
+		public function uploadFile($base64, $filename): int;
 
 		public function getCardInfo($cardID): array;
 
