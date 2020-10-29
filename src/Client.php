@@ -1378,4 +1378,142 @@
 		public function isNetworkEnabled(): bool {
 			return $this->getSystemInfo()['result']['networkEnabled'];
 		}
+		
+		public function getReleaseNotes(): array {
+			return $this->checkResultVar($this->api_query('getReleaseNotes'), []);
+		}
+		
+		public function getSettingInfo($settingId = ''): array {
+			return $this->checkResultVar(
+				$this->api_query('getReleaseNotes', ['settingId' => $settingId]), []
+			);
+		}
+		
+		public function setSettingInfo($settingId = '', $newValue = ''): bool {
+			return $this->checkResultVar(
+				$this->api_query(
+					'setSettingInfo', [
+						'settingId' => $settingId,
+						'newValue'  => $newValue
+					]
+				), false
+			);
+		}
+		
+		public function pinInstantMessage($to = '', $messageId = '', $pin = true): int {
+			return $this->checkResultVar(
+				$this->api_query(
+					'pinInstantMessage', [
+						'to'        => $to,
+						'messageId' => $messageId,
+						'pin'       => $pin
+					]
+				), 0
+			);
+		}
+		
+		public function getPinnedMessages($to = ''): array {
+			return $this->checkResultVar(
+				$this->api_query(
+					'getPinnedMessages', [
+						'to' => $to
+					]
+				), []
+			);
+		}
+		
+		public function bookmarkInstantMessage($messageId = 11, $comments = ''): int {
+			return $this->checkResultVar(
+				$this->api_query(
+					'bookmarkInstantMessage', [
+						'messageId' => $messageId,
+						'comments'  => $comments
+					]
+				), 0
+			);
+		}
+		
+		public function acceptAttachment($emailId = '100', $fileId = '100'): bool {
+			return $this->checkResultVar(
+				$this->api_query(
+					'acceptAttachment', [
+						'emailId' => $emailId,
+						'fileId'  => $fileId
+					]
+				), false
+			);
+		}
+		
+		public function abortAttachment($emailId = '100', $fileId = '100'): bool {
+			return $this->checkResultVar(
+				$this->api_query(
+					'abortAttachment', [
+						'emailId' => $emailId,
+						'fileId'  => $fileId
+					]
+				), false
+			);
+		}
+		
+		public function acceptFileMessage($messageId = '100'): bool {
+			return $this->checkResultVar(
+				$this->api_query(
+					'acceptFileMessage', [
+						'messageId' => $messageId
+					]
+				), false
+			);
+		}
+		
+		public function abortFileMessage($messageId = '100'): bool {
+			return $this->checkResultVar(
+				$this->api_query(
+					'abortFileMessage', [
+						'messageId' => $messageId
+					]
+				), false
+			);
+		}
+		
+		public function emptyEmailsTrash($messageId = '100'): bool {
+			return $this->checkResultVar(
+				$this->api_query('emptyEmailsTrash'), false
+			);
+		}
+		
+		public function setChannelAsBookmarked($channelid = '', $bookmarked = true): bool {
+			return $this->checkResultVar(
+				$this->api_query('setChannelAsBookmarked', [
+					'channelid'  => $channelid,
+					'bookmarked' => $bookmarked
+				]), false
+			);
+		}
+		
+		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array {
+			return $this->checkResultVar(
+				$this->api_query('getChannelBannedContacts', [
+					'channelid' => $channelid
+				]), []
+			);
+		}
+		
+		public function applyChannelBannedContacts($channelid = '', $newList = '[]'): array {
+			//newList examaple:
+			//"[{"hash":"04E06F309930BD34B2FE1E95C852E6FF","nick":"mick"},{"hash":"BD287E72AB20D619737478D24D28949E","nick":"spammer"}]"
+			return $this->checkResultVar(
+				$this->api_query('applyChannelBannedContacts', [
+					'channelid' => $channelid,
+					'newList'   => $newList
+				]), []
+			);
+		}
+		
+		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array {
+			return $this->checkResultVar(
+				$this->api_query('getChannelBannedContacts', [
+					'channelid' => $channelid
+				]), []
+			);
+		}
 	}

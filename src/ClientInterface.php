@@ -548,4 +548,34 @@
 		public function findChannelsByPubkey($pubkey): array;
 
 		public function isNetworkEnabled(): bool;
+		
+		public function getReleaseNotes(): array;
+		
+		public function getSettingInfo($settingId = ''): array;
+		
+		public function setSettingInfo($settingId = '', $newValue = ''): bool;
+		
+		public function pinInstantMessage($to = '', $messageId = '', $pin = true): int;
+		
+		public function getPinnedMessages($to = ''): array;
+		
+		public function bookmarkInstantMessage($messageId = 11, $comments = ''): int;
+		
+		public function acceptAttachment($emailId = '100', $fileId = '100'): bool;
+		
+		public function abortAttachment($emailId = '100', $fileId = '100'): bool;
+		
+		public function acceptFileMessage($messageId = '100'): bool;
+		
+		public function abortFileMessage($messageId = '100'): bool;
+		
+		public function emptyEmailsTrash($messageId = '100'): bool;
+		
+		public function setChannelAsBookmarked($channelid = '', $bookmarked = true): bool;
+		
+		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array;
+		
+		public function applyChannelBannedContacts($channelid = '', $newList = '[]'): array;
+		
+		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array;
 	}
