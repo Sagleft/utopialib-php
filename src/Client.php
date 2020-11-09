@@ -1508,12 +1508,4 @@
 				]), []
 			);
 		}
-		
-		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array {
-			return $this->checkResultVar(
-				$this->api_query('getChannelBannedContacts', [
-					'channelid' => $channelid
-				]), []
-			);
-		}
 	}
