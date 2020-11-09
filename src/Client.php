@@ -1475,7 +1475,7 @@
 			);
 		}
 		
-		public function emptyEmailsTrash($messageId = '100'): bool {
+		public function emptyEmailsTrash(): bool {
 			return $this->checkResultVar(
 				$this->api_query('emptyEmailsTrash'), false
 			);
