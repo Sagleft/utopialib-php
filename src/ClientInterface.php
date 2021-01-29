@@ -576,6 +576,4 @@
 		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array;
 		
 		public function applyChannelBannedContacts($channelid = '', $newList = '[]'): array;
-		
-		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array;
 	}
