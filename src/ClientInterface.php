@@ -573,7 +573,7 @@
 
 		public function setChannelAsBookmarked($channelid = '', $bookmarked = true): bool;
 
-		public function getChannelBannedContacts($channelid = '', $bookmarked = true): array;
+		public function getChannelBannedContacts($channelid = ''): array;
 
 		public function applyChannelBannedContacts($channelid = '', $newList = '[]'): array;
 	}
