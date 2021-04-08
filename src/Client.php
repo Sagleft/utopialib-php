@@ -250,6 +250,10 @@
 			return $response['result'];
 		}
 
+		public function removeContactNick($pk = ''): bool {
+			return $this->setContactNick($pk, 'Anonymous');
+		}
+
 		public function sendInstantMessage($pkOrNick = '', $message = 'test message'): int {
 			$params = [
 				'to'   => $pkOrNick,
@@ -268,6 +272,14 @@
 				return 0;
 			}
 			return $result;
+		}
+
+		public function sendInstantPINGMessage($pkOrNick = ''): int {
+			return $this->sendInstantMessage($pkOrNick, 'PING');
+		}
+
+		public function sendInstantPONGMessage($pkOrNick = ''): int {
+			return $this->sendInstantMessage($pkOrNick, 'PONG');
 		}
 
 		public function sendInstantQuote($pkOrNick = '', $text = 'instant quoute', $id_message = 232): int {
@@ -406,14 +418,22 @@
 				'to'      => $pkOrNick,
 				'amount'  => $amount
 			];
-			if($fromCard != "") {
+			if($fromCard != '') {
 				$params['fromCard'] = $fromCard;
 			}
-			if($comment != "") {
+			if($comment != '') {
 				$params['comment'] = $comment;
 			}
 			$response = $this->api_query("sendPayment", $params);
 			return $this->checkResultVar($response, '');
+		}
+
+		public function sendPaymentToPubkeyOrNick($pkOrNick = '', $amount = 1, $comment = ''): string {
+			return $this->sendPayment('', $pkOrNick, $amount, $comment);
+		}
+
+		public function sendPaymentToCard($cardid = '', $amount = 1, $comment = '', $fromCard = ''): string {
+			return $this->sendPayment($cardid, '', $amount, $comment, $fromCard);
 		}
 
 		public function getEmailFolder($folderType = 1, $search_filter = '', $query_filter = null): array {
@@ -449,6 +469,11 @@
 			$response = $this->api_query("deleteEmail", $params);
 			return $this->checkResultVar($response, false);
 		}
+
+		/*public function deleteAllEmails() {
+			//$folderType = 1, $search_filter = '', $query_filter = null
+			//TODO
+		}*/
 
 		public function sendReplyEmailMessage($id = 33, $body = "my message", $subject = "uMail subject"): bool {
 			$params = [
